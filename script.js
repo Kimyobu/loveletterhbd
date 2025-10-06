@@ -274,7 +274,7 @@ const photoPaths = [
     // Put your image filenames in the photos/ folder and list them here
     // Example placeholders:
     'photos/IM.JPG',
-].concat([...Array(15)].map((_, i) => `photos/IM${i+2}.jpeg`));
+].concat([...Array(48)].map((_, i) => `photos/IM${i+2}.jpeg`));
 
 function renderGallery() {
     // Album cover images
