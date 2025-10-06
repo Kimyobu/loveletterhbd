@@ -1,5 +1,6 @@
 // Open letter function
 function openLetter() {
+    playPage()
     const closedLetter = document.getElementById('closed-letter');
     const letterContainer = document.getElementById('letter-container');
     
@@ -254,8 +255,12 @@ function init() {
     // Add touch interactions
     addTouchInteractions();
     
-    // Add typing effect (optional - uncomment if desired)
-    // addTypingEffect();
+    // Render attachments gallery and bind interactions
+    renderGallery();
+    bindGiftInteractions();
+    bindCakeInteraction();
+    revealAttachmentsAfterReading();
+    initAudioOnce();
     
     console.log('💕 จดหมายรักเว็บไซต์เริ่มต้นแล้ว 💕');
     console.log('กด L สำหรับหัวใจ, M สำหรับพระจันทร์, P สำหรับอนุภาค');
@@ -263,3 +268,205 @@ function init() {
 
 // Start when DOM is loaded
 document.addEventListener('DOMContentLoaded', init);
+
+// ---------- Attachments Feature ----------
+const photoPaths = [
+    // Put your image filenames in the photos/ folder and list them here
+    // Example placeholders:
+    'photos/IM.JPG',
+].concat([...Array(15)].map((_, i) => `photos/IM${i+2}.jpeg`));
+
+function renderGallery() {
+    // Album cover images
+    const main = document.getElementById('album-main');
+    const s1 = document.getElementById('album-s1');
+    const s2 = document.getElementById('album-s2');
+    const s3 = document.getElementById('album-s3');
+    if (photoPaths.length > 0 && main) main.src = photoPaths[0];
+    if (photoPaths.length > 1 && s1) s1.src = photoPaths[1];
+    if (photoPaths.length > 2 && s2) s2.src = photoPaths[2];
+    if (photoPaths.length > 3 && s3) s3.src = photoPaths[3];
+
+    // Modal grid
+    const grid = document.getElementById('albumGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    photoPaths.forEach(src => {
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = 'our-memory';
+        grid.appendChild(img);
+    });
+}
+
+async function downloadAllPhotos() {
+    await ensureZipDeps();
+    if (!window.JSZip || !window.saveAs) {
+        alert('ไม่สามารถโหลดเครื่องมือดาวน์โหลดได้ กรุณารีเฟรชหน้าแล้วลองใหม่');
+        return;
+    }
+    const overlay = document.getElementById('downloadOverlay');
+    const bar = document.getElementById('downloadProgress');
+    const status = document.getElementById('downloadStatus');
+    if (overlay) overlay.style.display = 'flex';
+    const setProgress = (p, msg) => {
+        if (bar) bar.style.width = Math.max(1, Math.floor(p)) + '%';
+        if (status && msg) status.textContent = msg;
+    };
+    const zip = new JSZip();
+    const folder = zip.folder('our-photos');
+
+    const fetchAsBlob = async (url) => {
+        const res = await fetch(url, { cache: 'no-cache' });
+        if (!res.ok) throw new Error('Fetch failed: ' + url);
+        return await res.blob();
+    };
+
+    for (let i = 0; i < photoPaths.length; i++) {
+        try {
+            setProgress((i / photoPaths.length) * 60, `กำลังดึงรูปที่ ${i+1}/${photoPaths.length}`);
+            const blob = await fetchAsBlob(photoPaths[i]);
+            const name = photoPaths[i].split('/').pop() || `photo-${i+1}.jpg`;
+            folder.file(name, blob);
+        } catch (e) {
+            console.warn('Skip file due to error:', photoPaths[i], e);
+        }
+    }
+
+    setProgress(75, 'กำลังบีบอัดไฟล์เป็น ZIP…');
+    const content = await zip.generateAsync({ type: 'blob' }, (meta) => {
+        setProgress(75 + meta.percent * 0.25, 'กำลังบีบอัดไฟล์เป็น ZIP…');
+    });
+    setProgress(100, 'เสร็จสิ้น กำลังบันทึกไฟล์…');
+    saveAs(content, 'our-photos.zip');
+    const sfx = document.getElementById('sfxSuccess');
+    if (sfx) { try { sfx.currentTime = 0; sfx.play(); } catch(e) {} }
+    setTimeout(() => { if (overlay) overlay.style.display = 'none'; }, 600);
+}
+
+function scrollToAttachments() {
+    const el = document.getElementById('attachments');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+}
+
+function bindGiftInteractions() {
+    const gift = document.getElementById('giftBox');
+    const giftContents = document.getElementById('giftContents');
+    const albumCover = document.getElementById('albumCover');
+    const albumModal = document.getElementById('albumModal');
+    const albumBackdrop = document.getElementById('albumBackdrop');
+    const albumClose = document.getElementById('albumClose');
+    if (!gift) return;
+    gift.addEventListener('click', () => {
+        playPop()
+        gift.classList.toggle('gift-open');
+        if (giftContents) {
+            const isOpen = gift.classList.contains('gift-open');
+            giftContents.style.display = isOpen ? 'block' : 'none';
+        }
+        // Small heart burst when opening
+        for (let i = 0; i < 6; i++) setTimeout(createHeart, i * 120);
+    });
+
+    const openAlbum = () => { if (albumModal) albumModal.style.display = 'block'; playClick(); };
+    const closeAlbum = () => { if (albumModal) albumModal.style.display = 'none'; };
+    if (albumCover) albumCover.addEventListener('click', openAlbum);
+    if (albumBackdrop) albumBackdrop.addEventListener('click', closeAlbum);
+    if (albumClose) albumClose.addEventListener('click', closeAlbum);
+}
+
+function bindCakeInteraction() {
+    const candle = document.querySelector('.candle .flame');
+    if (!candle) return;
+    let lit = true;
+    const toggleFlame = () => {
+        lit = !lit;
+        candle.style.display = lit ? 'block' : 'none';
+        if (!lit) setTimeout(() => { lit = true; candle.style.display = 'block'; }, 1200);
+    };
+    const cake = document.getElementById('cake');
+    if (cake) cake.addEventListener('click', () => { toggleFlame(); playClick(); });
+}
+
+async function ensureZipDeps() {
+    const loadScript = (src) => new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+    });
+    if (!window.JSZip) {
+        try { await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'); } catch (e) {}
+    }
+    if (!window.saveAs) {
+        try { await loadScript('https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js'); } catch (e) {}
+    }
+}
+
+function revealAttachmentsAfterReading() {
+    const sentinel = document.getElementById('letter-end-sentinel');
+    const attachments = document.getElementById('attachments');
+    if (!sentinel || !attachments) return;
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                attachments.style.display = 'block';
+                attachments.style.opacity = '0';
+                attachments.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    attachments.style.transition = 'all 0.6s ease';
+                    attachments.style.opacity = '1';
+                    attachments.style.transform = 'translateY(0)';
+                }, 50);
+                observer.disconnect();
+            }
+        });
+    }, { threshold: 1.0 });
+    observer.observe(sentinel);
+}
+
+// ---------- Audio ----------
+function initAudioOnce() {
+    const bgm = document.getElementById('bgmAudio');
+    const toggle = document.getElementById('musicToggle');
+    if (!bgm || !toggle) return;
+    let initialized = false;
+    const tryInit = () => {
+        if (initialized) return;
+        initialized = true;
+        toggle.style.display = 'flex';
+        try { bgm.volume = 0.35; bgm.play(); } catch(e) {}
+    };
+    document.addEventListener('click', tryInit, { once: true });
+    document.addEventListener('touchstart', tryInit, { once: true });
+    toggle.addEventListener('click', () => {
+        if (bgm.paused) { try { bgm.play(); } catch(e) {} } else { bgm.pause(); }
+    });
+}
+
+function playClick() {
+    const s = document.getElementById('sfxClick');
+    if (!s) return;
+    try { s.currentTime = 0; s.play(); } catch(e) {}
+}
+
+function playPop() {
+    const pop_index = getRandomInt(1, 3)
+    const audio = document.getElementById("sfxPop")
+    audio.src = `audio/pop${pop_index}.mp3`
+    audio.play()
+}
+
+function playPage() {
+    const page_index = getRandomInt(1,2)
+    const audio = document.getElementById("sfxPage")
+    audio.src = `audio/page${page_index}.mp3`
+    audio.play()
+}
+
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }

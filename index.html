@@ -110,7 +110,55 @@
 
                     <p class="closing">ด้วยความรักและปรารถนาดี<br>นิวคนที่รักเธอมาก</p>
                 </div>
-                
+
+                <!-- Sentinel: show attachments after reaching end -->
+                <div id="letter-end-sentinel"></div>
+
+                <!-- Attachments Section (inside letter) -->
+                <section id="attachments" class="attachments-section" style="display:none;">
+                    <h2 class="attachments-title">สิ่งที่แนบมากับจดหมาย</h2>
+                    <p class="attachments-subtitle">เปิดของขวัญเพื่อดูความพิเศษข้างใน 🎁</p>
+
+                    <div class="surprises">
+                        <div class="gift-box" id="giftBox">
+                            <div class="lid"></div>
+                            <div class="box"></div>
+                            <div class="ribbon-vertical"></div>
+                            <div class="ribbon-horizontal"></div>
+                            <div class="gift-label">แตะเพื่อเปิดของขวัญ</div>
+                        </div>
+
+                        <div class="gift-contents" id="giftContents" style="display:none;">
+                            <div class="cake" id="cake">
+                                <div class="cake-top"></div>
+                                <div class="candle">
+                                    <div class="flame"></div>
+                                </div>
+                                <div class="cake-body"></div>
+                                <div class="cake-plate"></div>
+                                <div class="cake-label">Happy Birthday IM</div>
+                            </div>
+
+                            <div class="flowers" aria-label="flowers">
+                                <div class="flower">🌸</div>
+                                <div class="flower">🌼</div>
+                                <div class="flower">🌷</div>
+                            </div>
+
+                            <h3 class="attachments-title" style="margin-top:20px;">อัลบั้มรูปความทรงจำ</h3>
+                            
+                            <!-- Collapsible Album Cover -->
+                            <div class="album-cover" id="albumCover" role="button" aria-label="เปิดอัลบั้มรูป">
+                                <div class="album-stack main"><img id="album-main" alt="album-main"></div>
+                                <div class="album-stack s1"><img id="album-s1" alt="album-preview-1"></div>
+                                <div class="album-stack s2"><img id="album-s2" alt="album-preview-2"></div>
+                                <div class="album-stack s3"><img id="album-s3" alt="album-preview-3"></div>
+                            </div>
+                            <!-- Modal moved to end of body -->
+                        </div>
+                    </div>
+                </section>
+
                 <div class="letter-footer">
                     <div class="hearts">💕 🌙 💕</div>
                 </div>
@@ -124,7 +172,44 @@
     </div>
     
     <div class="particles" id="particles"></div>
-    
+
+    <!-- Global Album Modal -->
+    <div class="album-modal" id="albumModal" style="display:none;">
+        <div class="album-backdrop" id="albumBackdrop"></div>
+        <div class="album-dialog" role="dialog" aria-modal="true" aria-label="อัลบั้มรูป">
+            <button class="album-close" id="albumClose" aria-label="ปิดอัลบั้ม">✕</button>
+            <div class="album-grid" id="albumGrid"></div>
+            <div class="attachments-actions">
+                <button class="download-button" onclick="downloadAllPhotos()">ดาวน์โหลดรูปภาพทั้งหมด</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Download Progress Overlay -->
+    <div id="downloadOverlay" class="download-overlay" style="display:none;">
+        <div class="download-card">
+            <div class="download-title">กำลังเตรียมดาวน์โหลด…</div>
+            <div class="download-status" id="downloadStatus">เริ่มต้น…</div>
+            <div class="progress">
+                <div class="progress-bar" id="downloadProgress" style="width:0%"></div>
+            </div>
+            <div class="download-hint">โปรดรอสักครู่ ระบบจะบันทึกไฟล์ให้อัตโนมัติ</div>
+        </div>
+    </div>
+
+    <!-- Audio: background music and SFX -->
+    <audio id="bgmAudio" loop preload="auto" src="audio/bgm.mp3"></audio>
+    <audio id="sfxSuccess" preload="auto" src="audio/success.mp3"></audio>
+    <audio id="sfxClick" preload="auto" src="audio/click.mp3"></audio>
+    <audio id="sfxPop" preload="auto"></audio>
+    <audio id="sfxPage" preload="auto"></audio>
+
+    <!-- Minimal music toggle -->
+    <button id="musicToggle" class="music-toggle" aria-label="สลับเพลง" style="display:none;">♪</button>
+
+    <!-- JSZip and FileSaver for ZIP download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js" referrerpolicy="no-referrer"></script>
     <script src="script.js"></script>
 </body>
 </html>
