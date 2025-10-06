@@ -1,0 +1,495 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Kanit', sans-serif;
+    background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Moon and Stars */
+.moon-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.moon {
+    position: absolute;
+    top: 10%;
+    right: 15%;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle at 30% 30%, #f8f8ff, #e6e6fa, #d3d3d3);
+    border-radius: 50%;
+    box-shadow: 
+        0 0 30px rgba(255, 255, 255, 0.3),
+        0 0 60px rgba(255, 255, 255, 0.2),
+        0 0 90px rgba(255, 255, 255, 0.1);
+    animation: moonGlow 4s ease-in-out infinite alternate;
+}
+
+@keyframes moonGlow {
+    0% { 
+        box-shadow: 
+            0 0 30px rgba(255, 255, 255, 0.3),
+            0 0 60px rgba(255, 255, 255, 0.2),
+            0 0 90px rgba(255, 255, 255, 0.1);
+    }
+    100% { 
+        box-shadow: 
+            0 0 40px rgba(255, 255, 255, 0.4),
+            0 0 80px rgba(255, 255, 255, 0.3),
+            0 0 120px rgba(255, 255, 255, 0.2);
+    }
+}
+
+.stars {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, #eee, transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+        radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.6), transparent),
+        radial-gradient(2px 2px at 160px 30px, #ddd, transparent);
+    background-repeat: repeat;
+    background-size: 200px 100px;
+    animation: twinkle 3s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+    0% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+/* Main Container */
+.container {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Closed Letter - Envelope */
+.closed-letter {
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.closed-letter:hover {
+    transform: scale(1.05);
+}
+
+.envelope {
+    position: relative;
+    width: 300px;
+    height: 200px;
+    margin: 0 auto;
+}
+
+.envelope-front {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(145deg, #f8f8ff, #e6e6fa);
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transform: perspective(1000px) rotateX(15deg);
+    transition: transform 0.3s ease;
+}
+
+.envelope-flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: linear-gradient(145deg, #d3d3d3, #c0c0c0);
+    border-radius: 10px 10px 0 0;
+    transform-origin: top;
+    transition: transform 0.3s ease;
+}
+
+.envelope-body {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.envelope-address {
+    text-align: center;
+    color: #2c3e50;
+}
+
+.to-label, .from-label {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin-bottom: 5px;
+}
+
+.recipient-name, .sender-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    font-family: 'Sriracha', cursive;
+}
+
+.recipient-name {
+    color: #8e44ad;
+}
+
+.sender-name {
+    color: #e74c3c;
+}
+
+.open-instruction {
+    text-align: center;
+    margin-top: 30px;
+    color: #ecf0f1;
+    font-size: 1.1rem;
+}
+
+.tap-icon {
+    font-size: 2rem;
+    margin-top: 10px;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Letter Container */
+.letter-container {
+    perspective: 1000px;
+    margin-bottom: 30px;
+}
+
+.letter {
+    background: linear-gradient(145deg, #f8f8ff, #f0f0ff);
+    border-radius: 15px;
+    padding: 40px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transform: rotateY(-5deg) rotateX(5deg);
+    transition: transform 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.letter:hover {
+    transform: rotateY(-2deg) rotateX(2deg);
+}
+
+.letter::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #ff6b6b, #ff8e8e, #ff6b6b);
+    border-radius: 15px 15px 0 0;
+}
+
+.letter-header {
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 20px;
+}
+
+.letter-header h1 {
+    font-family: 'Sriracha', cursive;
+    font-size: 2.5rem;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.date {
+    font-size: 1.2rem;
+    color: #7f8c8d;
+    font-weight: 600;
+    letter-spacing: 2px;
+}
+
+.letter-content {
+    line-height: 1.8;
+    color: #2c3e50;
+    font-size: 1.1rem;
+}
+
+.letter-content p {
+    margin-bottom: 20px;
+    text-align: justify;
+    text-indent: 20px;
+}
+
+.greeting {
+    font-style: italic;
+    color: #8e44ad;
+    font-weight: 600;
+    text-indent: 0;
+    text-align: center;
+}
+
+.closing {
+    text-align: right;
+    font-style: italic;
+    color: #8e44ad;
+    font-weight: 600;
+    margin-top: 30px;
+}
+
+.letter-footer {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.hearts {
+    font-size: 1.5rem;
+    animation: heartBeat 2s ease-in-out infinite;
+}
+
+@keyframes heartBeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* Interactive Elements */
+.interactive-elements {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.moon-button {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    font-family: 'Playfair Display', serif;
+}
+
+.moon-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(45deg, #764ba2, #667eea);
+}
+
+.moon-button:active {
+    transform: translateY(-1px);
+}
+
+/* Floating Hearts */
+.floating-hearts {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.heart {
+    position: absolute;
+    color: #ff6b6b;
+    font-size: 20px;
+    animation: floatUp 3s ease-out forwards;
+    pointer-events: none;
+}
+
+@keyframes floatUp {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-100vh) scale(0.5);
+    }
+}
+
+/* Particles */
+.particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.particle {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    animation: particleFloat 6s linear infinite;
+}
+
+@keyframes particleFloat {
+    0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* iPad Optimized Design */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .envelope {
+        width: 400px;
+        height: 250px;
+    }
+    
+    .letter {
+        padding: 50px;
+        max-width: 700px;
+    }
+    
+    .letter-header h1 {
+        font-size: 3rem;
+    }
+    
+    .letter-content {
+        font-size: 1.3rem;
+        line-height: 2;
+    }
+    
+    .moon {
+        width: 150px;
+        height: 150px;
+        top: 8%;
+        right: 12%;
+    }
+    
+    .moon-button {
+        padding: 20px 40px;
+        font-size: 1.3rem;
+    }
+    
+    .envelope-address {
+        font-size: 1.1rem;
+    }
+    
+    .recipient-name, .sender-name {
+        font-size: 1.4rem;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .letter {
+        padding: 25px;
+        margin: 10px;
+    }
+    
+    .letter-header h1 {
+        font-size: 2rem;
+    }
+    
+    .letter-content {
+        font-size: 1rem;
+    }
+    
+    .moon {
+        width: 80px;
+        height: 80px;
+        top: 5%;
+        right: 10%;
+    }
+    
+    .letter {
+        transform: rotateY(-2deg) rotateX(2deg);
+    }
+    
+    .envelope {
+        width: 250px;
+        height: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .letter {
+        padding: 20px;
+        margin: 5px;
+    }
+    
+    .letter-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .letter-content {
+        font-size: 0.95rem;
+    }
+    
+    .moon-button {
+        padding: 12px 25px;
+        font-size: 1rem;
+    }
+    
+    .envelope {
+        width: 200px;
+        height: 120px;
+    }
+}
